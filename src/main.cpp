@@ -10,11 +10,19 @@ struct act_t {
     pt_t src, dst;
 };
 
-struct game_t {
+// don't pass .
+int color(char c) {
+    if (c=='.') return -1;
+    if (c<='Z') return 0;
+    if (c>='a') return 1;
+    assertm(false, "invalid character passed to game color() function");
+}
+
+struct state_t {
     string board;
     int turn; // 0=white, 1=black
 
-    game_t() {
+    state_t() {
         board = "rnbqkbnr"
                 "pppppppp"
                 "........"
@@ -28,14 +36,6 @@ struct game_t {
 
     // possible actions for current player
 #include "gpt/game-actions"
-
-    // don't pass .
-    int color(char c) {
-        if (c=='.') return -1;
-        if (c<='Z') return 0;
-        if (c>='a') return 1;
-        assertm(false, "invalid character passed to game color() function");
-    }
 
     char &atref(int r, int c) {
         return board[r*8+c];
@@ -63,15 +63,6 @@ struct game_t {
 #include "gpt/play"
 
 int main() {
-    game_t game;
-    game.board = "........"
-                 "........"
-                 "....k..."
-                 "....Q..."
-                 "....K..."
-                 "........"
-                 "........"
-                 "........";
-
+    state_t game;
     play(game);
 }

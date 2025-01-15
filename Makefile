@@ -1,2 +1,2 @@
 all:
-	g++ -std=c++17 main.cpp -ggdb
+	g++ -std=c++17 src/*.cpp -ggdb

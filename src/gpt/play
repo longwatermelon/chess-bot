@@ -1,4 +1,4 @@
-void play(game_t& game) {
+void play(state_t& game) {
     while (true) {
         // Display the board
         for (int r = 0; r < 8; ++r) {
