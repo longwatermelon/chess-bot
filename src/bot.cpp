@@ -1,6 +1,6 @@
 #include "bot.h"
 #include "util.h"
-#include "actions.h"
+#include "gpt/actions.h"
 
 double bot::static_eval(state_t &s) {
     // checkmate?

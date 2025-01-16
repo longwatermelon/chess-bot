@@ -1,6 +1,6 @@
 #include "state.h"
 // #include "playcli.h"
-#include "playgui.h"
+#include "gpt/playgui.h"
 
 int main() {
     state_t game;
