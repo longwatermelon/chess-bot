@@ -2,7 +2,7 @@
 #include "util.h"
 #include "actions.h"
 
-double bot::static_eval(const state_t &s) {
+double bot::static_eval(state_t &s) {
     // checkmate?
     if (empty(actions(s,true))) return vec<int>{-1,1}[s.turn]*1e9;
 
@@ -70,22 +70,25 @@ double bot::minimax(state_t &s, int d, double alpha, double beta, int &visited) 
     }
 }
 
-act_t bot::best_move(const state_t &s, int depth) {
+act_t bot::best_move(state_t &s, int depth) {
     vec<act_t> moves=actions(s, true);
+
+    auto st=chrono::steady_clock::now();
 
     double mn=1e9;
     act_t best;
     int vis=0;
     for (act_t a : moves) {
-        state_t sp=s;
-        sp.move(a);
-
-        if (ckmin(mn, minimax(sp, depth, -1e9, 1e9, vis))) {
+        char taken=s.temp_move(a);
+        if (ckmin(mn, minimax(s, depth, -1e9, 1e9, vis))) {
             best=a;
         }
+        s.undo_move(a,taken);
     }
 
-    printf("visited %d states\n", vis);
+    int dur=chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now()-st).count();
+
+    printf("visited %d states, took %.2fs\n", vis, (double)dur/1000);
     printf("black going for best eval of %.2f\n", mn);
     return best;
 }
