@@ -19,7 +19,7 @@ inline void generate_pawn_moves(const state_t& state, int r, int c, vec<act_t>& 
     // Captures
     for (int dc : {-1, 1}) {
         int nr = r + direction, nc = c + dc;
-        if (nc >= 0 && nc < 8 && color(state.at(nr, nc)) != state.turn) {
+        if (nc >= 0 && nc < 8 && state.at(nr,nc)!='.' && color(state.at(nr, nc)) != state.turn) {
             actions.push_back({{r, c}, {nr, nc}});
         }
     }
@@ -102,12 +102,13 @@ inline void generate_king_moves(const state_t& state, int r, int c, vec<act_t>& 
     }
 }
 
+// check if current player can take other player's king
 inline bool is_king_in_check(const state_t& state) {
     int king_row = -1, king_col = -1;
     for (int r = 0; r < 8; ++r) {
         for (int c = 0; c < 8; ++c) {
             char piece = state.at(r, c);
-            if ((state.turn == 0 && piece == 'K') || (state.turn == 1 && piece == 'k')) {
+            if ((state.turn == 1 && piece == 'K') || (state.turn == 0 && piece == 'k')) {
                 king_row = r;
                 king_col = c;
             }
@@ -124,7 +125,7 @@ inline bool is_king_in_check(const state_t& state) {
     for (int r = 0; r < 8; ++r) {
         for (int c = 0; c < 8; ++c) {
             char piece = state.at(r, c);
-            if (piece != '.' && color(piece) != state.turn) {
+            if (piece != '.' && color(piece) == state.turn) {
                 vec<act_t> opponent_moves;
                 switch (tolower(piece)) {
                     case 'p':
@@ -193,13 +194,10 @@ inline vec<act_t> actions(const state_t& state, bool legal) {
         vec<act_t> legal_actions;
         for (const auto& move : possible_actions) {
             // Simulate the move and check if it puts the player in check
-            char captured_piece = state.at(move.dst.r, move.dst.c);
-            char temp = state.at(move.src.r, move.src.c);
-            state_t temp_state = state;
-            temp_state.atref(move.dst.r, move.dst.c) = temp_state.at(move.src.r, move.src.c);
-            temp_state.atref(move.src.r, move.src.c) = '.';
+            state_t sp=state;
+            sp.move(move);
 
-            if (!is_king_in_check(temp_state)) {
+            if (!is_king_in_check(sp)) {
                 legal_actions.push_back(move);
             }
         }

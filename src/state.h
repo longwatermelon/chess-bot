@@ -25,6 +25,7 @@ struct state_t {
     void move(act_t a) {
         atref(a.dst.r, a.dst.c) = at(a.src.r, a.src.c);
         atref(a.src.r, a.src.c) = '.';
+        turn=1-turn;
     }
 
     char &atref(int r, int c) {

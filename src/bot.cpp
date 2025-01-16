@@ -73,5 +73,6 @@ act_t bot::best_move(const state_t &s, int depth) {
         }
     }
 
+    printf("black going for best eval of %.2f\n", mn);
     return best;
 }

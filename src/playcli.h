@@ -77,12 +77,7 @@ inline void play(state_t& s) {
                 }
 
                 if (valid_move) {
-                    // Execute the move
-                    s.atref(dst_row, dst_col) = s.at(src_row, src_col);
-                    s.atref(src_row, src_col) = '.';
-
-                    // Switch turn
-                    s.turn = 1 - s.turn;
+                    s.move({{src_row,src_col}, {dst_row,dst_col}});
                     break;
                 } else {
                     std::cout << "Invalid move. Try again.\n";
