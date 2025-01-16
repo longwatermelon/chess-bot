@@ -30,7 +30,8 @@ double bot::static_eval(const state_t &s) {
     return res;
 }
 
-double bot::minimax(const state_t &s, int d) {
+double bot::minimax(state_t &s, int d, double alpha, double beta, int &visited) {
+    visited++;
     vec<act_t> moves=actions(s, true);
 
     // leaf
@@ -40,9 +41,14 @@ double bot::minimax(const state_t &s, int d) {
         // white
         double mx=-1e9;
         for (act_t &a : moves) {
-            state_t sp=s;
-            sp.move(a);
-            ckmax(mx, minimax(sp, d-1));
+            char taken=s.temp_move(a);
+            double eval=minimax(s, d-1, alpha, beta, visited);
+            s.undo_move(a,taken);
+
+            ckmax(mx, eval);
+
+            ckmax(alpha, eval);
+            if (beta<=alpha) break;
         }
 
         return mx;
@@ -50,9 +56,14 @@ double bot::minimax(const state_t &s, int d) {
         // black
         double mn=1e9;
         for (act_t &a : moves) {
-            state_t sp=s;
-            sp.move(a);
-            ckmin(mn, minimax(sp, d-1));
+            char taken=s.temp_move(a);
+            double eval=minimax(s, d-1, alpha, beta, visited);
+            s.undo_move(a,taken);
+
+            ckmin(mn, eval);
+
+            ckmin(beta, eval);
+            if (beta<=alpha) break;
         }
 
         return mn;
@@ -64,15 +75,17 @@ act_t bot::best_move(const state_t &s, int depth) {
 
     double mn=1e9;
     act_t best;
+    int vis=0;
     for (act_t a : moves) {
         state_t sp=s;
         sp.move(a);
 
-        if (ckmin(mn, minimax(sp, depth))) {
+        if (ckmin(mn, minimax(sp, depth, -1e9, 1e9, vis))) {
             best=a;
         }
     }
 
+    printf("visited %d states\n", vis);
     printf("black going for best eval of %.2f\n", mn);
     return best;
 }

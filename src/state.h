@@ -28,6 +28,18 @@ struct state_t {
         turn=1-turn;
     }
 
+    char temp_move(act_t a) {
+        char ret=at(a.dst.r, a.dst.c);
+        move(a);
+        return ret;
+    }
+
+    void undo_move(act_t a, char taken) {
+        swap(a.src,a.dst);
+        move(a);
+        atref(a.src.r, a.src.c) = taken;
+    }
+
     char &atref(int r, int c) {
         return board[r*8+c];
     }
