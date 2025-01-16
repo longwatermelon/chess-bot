@@ -1,3 +1,4 @@
+#pragma once
 #include <bits/stdc++.h>
 using namespace std;
 using ll=long long;
@@ -19,3 +20,16 @@ template <typename T> bool ckmax(T &a, T b) {return b>a ? a=b, true : false;}
             assert(cond); \
         } \
     } while (false)
+
+// 2d point
+struct pt_t {
+    int r,c;
+};
+
+// piece color given char c
+inline int color(char c) {
+    if (c=='.') return -1;
+    if (c<='Z') return 0;
+    if (c>='a') return 1;
+    assertm(false, "invalid character passed to game color() function");
+}
