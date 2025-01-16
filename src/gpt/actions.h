@@ -194,11 +194,11 @@ inline vec<act_t> actions(state_t& state, bool legal) {
         vec<act_t> legal_actions;
         for (const auto& move : possible_actions) {
             // Simulate the move and check if it puts the player in check
-            char taken=state.temp_move(move);
-            if (!is_king_in_check(state)) {
+            state_t sp=state;
+            sp.move(move);
+            if (!is_king_in_check(sp)) {
                 legal_actions.push_back(move);
             }
-            state.undo_move(move, taken);
         }
         return legal_actions;
     }

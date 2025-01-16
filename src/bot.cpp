@@ -41,9 +41,9 @@ double bot::minimax(state_t &s, int d, double alpha, double beta, int &visited) 
         // white
         double mx=-1e9;
         for (act_t &a : moves) {
-            char taken=s.temp_move(a);
-            double eval=minimax(s, d-1, alpha, beta, visited);
-            s.undo_move(a,taken);
+            state_t sp=s;
+            sp.move(a);
+            double eval=minimax(sp, d-1, alpha, beta, visited);
 
             ckmax(mx, eval);
 
@@ -56,9 +56,9 @@ double bot::minimax(state_t &s, int d, double alpha, double beta, int &visited) 
         // black
         double mn=1e9;
         for (act_t &a : moves) {
-            char taken=s.temp_move(a);
-            double eval=minimax(s, d-1, alpha, beta, visited);
-            s.undo_move(a,taken);
+            state_t sp=s;
+            sp.move(a);
+            double eval=minimax(sp, d-1, alpha, beta, visited);
 
             ckmin(mn, eval);
 
@@ -79,11 +79,11 @@ act_t bot::best_move(state_t &s, int depth) {
     act_t best;
     int vis=0;
     for (act_t a : moves) {
-        char taken=s.temp_move(a);
-        if (ckmin(mn, minimax(s, depth, -1e9, 1e9, vis))) {
+        state_t sp=s;
+        sp.move(a);
+        if (ckmin(mn, minimax(sp, depth, -1e9, 1e9, vis))) {
             best=a;
         }
-        s.undo_move(a,taken);
     }
 
     int dur=chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now()-st).count();

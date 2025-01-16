@@ -1,3 +1,4 @@
 a.out
 compile_commands.json
 .cache
+perf.data
