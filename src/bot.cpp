@@ -4,7 +4,7 @@
 
 double bot::static_eval(const state_t &s) {
     // checkmate?
-    if (empty(actions(s,s.turn,true))) return vec<int>{-1,1}[s.turn]*1e9;
+    if (empty(actions(s,true))) return vec<int>{-1,1}[s.turn]*1e9;
 
     // count pieces
     vec<char> pieces={'r','b','n','q','p'};
@@ -31,7 +31,7 @@ double bot::static_eval(const state_t &s) {
 }
 
 double bot::minimax(const state_t &s, int d) {
-    vec<act_t> moves=actions(s, s.turn, true);
+    vec<act_t> moves=actions(s, true);
 
     // leaf
     if (d==0 || empty(moves)) return static_eval(s);
@@ -60,7 +60,7 @@ double bot::minimax(const state_t &s, int d) {
 }
 
 act_t bot::best_move(const state_t &s, int depth) {
-    vec<act_t> moves=actions(s, s.turn, true);
+    vec<act_t> moves=actions(s, true);
 
     double mn=1e9;
     act_t best;

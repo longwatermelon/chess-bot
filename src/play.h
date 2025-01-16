@@ -3,45 +3,45 @@
 #include "actions.h"
 #include "bot.h"
 
-inline void play(state_t& game) {
+inline void play(state_t& s) {
     while (true) {
         // Display the board
         for (int r = 0; r < 8; ++r) {
             for (int c = 0; c < 8; ++c) {
-                std::cout << game.at(r, c) << ' ';
+                std::cout << s.at(r, c) << ' ';
             }
             std::cout << '\n';
         }
 
-        printf("eval: %.2f\n", bot::static_eval(game));
+        printf("eval: %.2f\n", bot::static_eval(s));
 
         // Show current turn
-        std::cout << (game.turn == 0 ? "White's turn" : "Black's turn") << "\n";
+        std::cout << (s.turn == 0 ? "White's turn" : "Black's turn") << "\n";
 
         // Check if current player is in check
-        if (is_king_in_check(game, game.turn)) {
-            std::cout << (game.turn == 0 ? "White is in check!" : "Black is in check!") << "\n";
+        if (is_king_in_check(s)) {
+            std::cout << (s.turn == 0 ? "White is in check!" : "Black is in check!") << "\n";
         }
 
         // Get possible actions
-        vec<act_t> possible_moves = actions(game, game.turn, true);
+        vec<act_t> possible_moves = actions(s, true);
 
         if (possible_moves.empty()) {
-            std::cout << (game.turn == 0 ? "Black wins!" : "White wins!") << "\n";
+            std::cout << (s.turn == 0 ? "Black wins!" : "White wins!") << "\n";
             break;
         }
 
-        if (game.turn == 1) { // Black's turn
-            act_t move = bot::best_move(game, 2); // Depth set to 3 for example
+        if (s.turn == 1) { // Black's turn
+            act_t move = bot::best_move(s, 2); // Depth set to 3 for example
             std::cout << "Black plays: " << static_cast<char>('a' + move.src.c) << (8 - move.src.r) 
                       << " " << static_cast<char>('a' + move.dst.c) << (8 - move.dst.r) << "\n";
 
             // Execute the move
-            game.atref(move.dst.r, move.dst.c) = game.at(move.src.r, move.src.c);
-            game.atref(move.src.r, move.src.c) = '.';
+            s.atref(move.dst.r, move.dst.c) = s.at(move.src.r, move.src.c);
+            s.atref(move.src.r, move.src.c) = '.';
 
             // Switch turn
-            game.turn = 1 - game.turn;
+            s.turn = 1 - s.turn;
         } else { // White's turn
             while (true) {
                 std::string src, dst;
@@ -78,11 +78,11 @@ inline void play(state_t& game) {
 
                 if (valid_move) {
                     // Execute the move
-                    game.atref(dst_row, dst_col) = game.at(src_row, src_col);
-                    game.atref(src_row, src_col) = '.';
+                    s.atref(dst_row, dst_col) = s.at(src_row, src_col);
+                    s.atref(src_row, src_col) = '.';
 
                     // Switch turn
-                    game.turn = 1 - game.turn;
+                    s.turn = 1 - s.turn;
                     break;
                 } else {
                     std::cout << "Invalid move. Try again.\n";
