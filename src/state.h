@@ -22,15 +22,6 @@ struct state_t {
                 "........"
                 "PPPPPPPP"
                 "RNBQKBNR";
-
-        board = "r...k..r"
-                "pppppppp"
-                "........"
-                "........"
-                "........"
-                "........"
-                "PPPPPPPP"
-                "RNBQKBNR";
         turn=0;
     }
 
@@ -77,10 +68,15 @@ struct state_t {
     }
 
     char &atref(pt_t p) {
+        assert(inside(p));
         return board[p.r*8+p.c];
     }
 
     char at(pt_t p) const {
+        if (!inside(p)) {
+            printf("failed: %d %d\n", p.r, p.c);
+        }
+        assert(inside(p));
         return board[p.r*8+p.c];
     }
 

@@ -14,7 +14,7 @@ double bot::static_eval(state_t &s) {
         bcnt[c]=count(all(s.board),c);
     }
 
-    static std::unordered_map<char, std::vector<std::vector<float>>> pos_points = {
+    static map<char, vec<vec<double>>> pos_points = {
         {'P', {
             {9.0,  9.0,  9.0,  9.0,  9.0,  9.0,  9.0,  9.0},
             {5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0},
@@ -163,12 +163,16 @@ double bot::static_eval(state_t &s) {
     for (int i=0; i<8; ++i) {
         for (int j=0; j<8; ++j) {
             if (s.at({i,j})) continue;
-            res+=pos_points[s.at({i,j})][i][j] * (color(s.at({i,j}))==0 ? 1 : -1);
+            res+=pos_points[s.at({i,j})][i][j]/10 * (color(s.at({i,j}))==0 ? 1 : -1);
         }
     }
 
+    if (abs(res)>0.05) {
+        printf("here\n");
+    }
+
     map<char,double> value = {
-        {'k', 1e9},
+        {'k', 1e3},
         {'q', 9},
         {'r', 5},
         {'b', 3}, {'n', 3},
@@ -188,7 +192,7 @@ double bot::minimax(state_t &s, int d, double alpha, double beta, int &visited) 
     sort(all(moves),[s](act_t a, act_t b){return (s.at(a.dst)!='.') > (s.at(b.dst)!='.');});
 
     // leaf
-    if (d==0 || find(all(s.board),'k')==end(s.board) || find(all(s.board),'K')==end(s.board)) return static_eval(s);
+    if (d==0 || empty(moves) || find(all(s.board),'k')==end(s.board) || find(all(s.board),'K')==end(s.board)) return static_eval(s);
 
     if (s.turn==0) {
         // white
@@ -228,7 +232,7 @@ act_t bot::best_move(state_t &s, int depth) {
 
     auto st=chrono::steady_clock::now();
 
-    act_t best;
+    act_t best=moves[0];
     double best_ev;
     int vis=0;
 
@@ -257,6 +261,6 @@ act_t bot::best_move(state_t &s, int depth) {
     int dur=chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now()-st).count();
 
     printf("visited %d states, took %.2fs\n", vis, (double)dur/1000);
-    printf("%s going for best eval of %.2f\n", s.turn==0?"white":"black", best_ev);
+    printf("eval %.2f\n", best_ev);
     return best;
 }

@@ -35,7 +35,7 @@ void pawn_moves(pt_t p, const state_t &s, vec<act_t> &moves) {
     MV(p, p+pt_t{rd,0}, s, moves);
 
     // 2 step forward
-    if (s.mvok({p, p+pt_t{rd,0}}) && (color(s.at(p))==0 && p.r==6) || (color(s.at(p))==1 && p.r==1)) {
+    if (s.inside(p+pt_t{rd,0}) && s.at(p+pt_t{rd,0})=='.' && (color(s.at(p))==0 && p.r==6) || (color(s.at(p))==1 && p.r==1)) {
         MV(p, p+pt_t{rd*2,0}, s, moves);
     }
 
