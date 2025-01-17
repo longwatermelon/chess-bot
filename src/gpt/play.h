@@ -129,7 +129,7 @@ inline void play(state_t& s) {
                         highlighted_squares.clear();
 
                         // Bot plays
-                        act_t bot_move = bot::best_move(s, 3); // Depth 2 for bot
+                        act_t bot_move = bot::best_move(s, 5); // Depth 2 for bot
                         s.move(bot_move);
                     } else {
                         // Deselect if clicking elsewhere
