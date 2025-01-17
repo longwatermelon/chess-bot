@@ -63,6 +63,9 @@ inline void play(state_t& s) {
     pt_t selected = {-1, -1};
     std::vector<pt_t> highlighted_squares;
 
+    // act_t bot_move = bot::best_move(s, 4); // Depth 2 for bot
+    // s.move(bot_move);
+
     while (running) {
         // Handle events
         while (SDL_PollEvent(&event)) {

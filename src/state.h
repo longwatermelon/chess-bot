@@ -22,6 +22,15 @@ struct state_t {
                 "........"
                 "PPPPPPPP"
                 "RNBQKBNR";
+
+        board = "r...k..r"
+                "pppppppp"
+                "........"
+                "........"
+                "........"
+                "........"
+                "PPPPPPPP"
+                "RNBQKBNR";
         turn=0;
     }
 
@@ -34,13 +43,32 @@ struct state_t {
             atref({7,3}) = 'R';
             atref({7,0}) = '.';
         }
-        if (at(a.src)=='k' && a.src==pt_t{0,4} && a.dst==pt_t{0,6} && at({0,5})=='.' && at({0,6})=='.' && at({0,7})=='R' && !king_moved[1] && !rook_moved[1][1]) {
+        if (at(a.src)=='k' && a.src==pt_t{0,4} && a.dst==pt_t{0,6} && at({0,5})=='.' && at({0,6})=='.' && at({0,7})=='r' && !king_moved[1] && !rook_moved[1][1]) {
             atref({0,5}) = 'r';
             atref({0,7}) = '.';
         }
-        if (at(a.src)=='k' && a.src==pt_t{0,4} && a.dst==pt_t{0,2} && at({0,3})=='.' && at({0,2})=='.' && at({0,1})=='.' && at({0,0})=='R' && !king_moved[1] && !rook_moved[1][0]) {
+        if (at(a.src)=='k' && a.src==pt_t{0,4} && a.dst==pt_t{0,2} && at({0,3})=='.' && at({0,2})=='.' && at({0,1})=='.' && at({0,0})=='r' && !king_moved[1] && !rook_moved[1][0]) {
             atref({0,3}) = 'r';
             atref({0,0}) = '.';
+        }
+
+        if (a.src==pt_t{7,4}) {
+            king_moved[0]=true;
+        }
+        if (a.src==pt_t{0,4}) {
+            king_moved[1]=true;
+        }
+        if (a.src==pt_t{7,0}) {
+            rook_moved[0][0]=true;
+        }
+        if (a.src==pt_t{7,7}) {
+            rook_moved[0][1]=true;
+        }
+        if (a.src==pt_t{0,0}) {
+            rook_moved[1][0]=true;
+        }
+        if (a.src==pt_t{0,7}) {
+            rook_moved[1][1]=true;
         }
 
         atref(a.dst) = at(a.src);
