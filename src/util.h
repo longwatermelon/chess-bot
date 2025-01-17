@@ -24,6 +24,10 @@ template <typename T> bool ckmax(T &a, T b) {return b>a ? a=b, true : false;}
 // 2d point
 struct pt_t {
     int r,c;
+
+    bool operator==(pt_t p) const {return r==p.r && c==p.c;}
+    pt_t operator+(pt_t p) const {return {r+p.r, c+p.c};}
+    pt_t operator-(pt_t p) const {return {r-p.r, c-p.c};}
 };
 
 // piece color given char c

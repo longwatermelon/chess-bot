@@ -6,7 +6,7 @@
 #include <iostream>
 #include <unordered_map>
 
-inline void play_gui(state_t& s) {
+inline void play(state_t& s) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
         return;
@@ -60,8 +60,8 @@ inline void play_gui(state_t& s) {
 
     bool running = true;
     SDL_Event event;
-    int selected_row = -1, selected_col = -1;
-    std::vector<std::pair<int, int>> highlighted_squares;
+    pt_t selected = {-1, -1};
+    std::vector<pt_t> highlighted_squares;
 
     while (running) {
         // Handle events
@@ -71,15 +71,14 @@ inline void play_gui(state_t& s) {
             } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                 int x = event.button.x;
                 int y = event.button.y;
-                int col = x / 100;
-                int row = y / 100;
+                pt_t clicked = {y / 100, x / 100};
 
                 if (!highlighted_squares.empty()) {
                     // Check if the click is on a highlighted square
-                    auto it = std::find(highlighted_squares.begin(), highlighted_squares.end(), std::make_pair(row, col));
+                    auto it = std::find(highlighted_squares.begin(), highlighted_squares.end(), clicked);
                     if (it != highlighted_squares.end()) {
                         // Move the piece
-                        act_t move = {{selected_row, selected_col}, {row, col}};
+                        act_t move = {selected, clicked};
                         s.move(move);
 
                         // Render board after player's move
@@ -98,7 +97,8 @@ inline void play_gui(state_t& s) {
                         // Draw pieces
                         for (int row = 0; row < 8; ++row) {
                             for (int col = 0; col < 8; ++col) {
-                                char piece = s.at(row, col);
+                                pt_t pos = {row, col};
+                                char piece = s.at(pos);
                                 if (piece != '.') {
                                     std::string key;
                                     if (isupper(piece)) {
@@ -125,8 +125,7 @@ inline void play_gui(state_t& s) {
                         SDL_RenderPresent(renderer);
 
                         // Reset selection
-                        selected_row = -1;
-                        selected_col = -1;
+                        selected = {-1, -1};
                         highlighted_squares.clear();
 
                         // Bot plays
@@ -134,22 +133,20 @@ inline void play_gui(state_t& s) {
                         s.move(bot_move);
                     } else {
                         // Deselect if clicking elsewhere
-                        selected_row = -1;
-                        selected_col = -1;
+                        selected = {-1, -1};
                         highlighted_squares.clear();
                     }
                 } else {
                     // Select a piece
-                    selected_row = row;
-                    selected_col = col;
+                    selected = clicked;
                     highlighted_squares.clear();
 
-                    char piece = s.at(row, col);
+                    char piece = s.at(selected);
                     if (piece != '.') {
                         vec<act_t> possible_moves = actions(s, true);
                         for (const auto& move : possible_moves) {
-                            if (move.src.r == row && move.src.c == col) {
-                                highlighted_squares.push_back({move.dst.r, move.dst.c});
+                            if (move.src.r == selected.r && move.src.c == selected.c) {
+                                highlighted_squares.push_back(move.dst);
                             }
                         }
                     }
@@ -173,14 +170,15 @@ inline void play_gui(state_t& s) {
         // Highlight possible moves
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 128);
         for (const auto& square : highlighted_squares) {
-            SDL_Rect highlight = {square.second * 100, square.first * 100, 100, 100};
+            SDL_Rect highlight = {square.c * 100, square.r * 100, 100, 100};
             SDL_RenderFillRect(renderer, &highlight);
         }
 
         // Draw pieces
         for (int row = 0; row < 8; ++row) {
             for (int col = 0; col < 8; ++col) {
-                char piece = s.at(row, col);
+                pt_t pos = {row, col};
+                char piece = s.at(pos);
                 if (piece != '.') {
                     std::string key;
                     if (isupper(piece)) {

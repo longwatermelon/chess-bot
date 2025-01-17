@@ -1,6 +1,6 @@
 #include "bot.h"
 #include "util.h"
-#include "gpt/actions.h"
+#include "actions.h"
 
 double bot::static_eval(state_t &s) {
     // checkmate?
@@ -33,6 +33,7 @@ double bot::static_eval(state_t &s) {
 double bot::minimax(state_t &s, int d, double alpha, double beta, int &visited) {
     visited++;
     vec<act_t> moves=actions(s, true);
+    sort(all(moves),[s](act_t a, act_t b){return (s.at(a.dst)!='.') > (s.at(b.dst)!='.');});
 
     // leaf
     if (d==0 || empty(moves)) return static_eval(s);
@@ -75,20 +76,41 @@ act_t bot::best_move(state_t &s, int depth) {
 
     auto st=chrono::steady_clock::now();
 
-    double mn=1e9;
     act_t best;
+    double best_ev;
     int vis=0;
-    for (act_t a : moves) {
-        state_t sp=s;
-        sp.move(a);
-        if (ckmin(mn, minimax(sp, depth, -1e9, 1e9, vis))) {
-            best=a;
+
+    if (s.turn==0) {
+        double mx=-1e9;
+        for (act_t a : moves) {
+            state_t sp=s;
+            sp.move(a);
+            double ev=minimax(sp, depth, -1e9, 1e9, vis);
+            if (ckmax(mx, ev)) {
+                best=a;
+                best_ev=mx;
+            } else if (mx==ev && rand()%100<=50) {
+                best=a;
+            }
+        }
+    } else {
+        double mn=1e9;
+        for (act_t a : moves) {
+            state_t sp=s;
+            sp.move(a);
+            double ev=minimax(sp, depth, -1e9, 1e9, vis);
+            if (ckmin(mn, ev)) {
+                best=a;
+                best_ev=mn;
+            } else if (mn==ev && rand()%100<=50) {
+                best=a;
+            }
         }
     }
 
     int dur=chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now()-st).count();
 
     printf("visited %d states, took %.2fs\n", vis, (double)dur/1000);
-    printf("black going for best eval of %.2f\n", mn);
+    printf("%s going for best eval of %.2f\n", s.turn==0?"white":"black", best_ev);
     return best;
 }
