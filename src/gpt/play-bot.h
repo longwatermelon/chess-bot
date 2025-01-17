@@ -63,7 +63,7 @@ inline void play_bot(state_t& s) {
     int winner;
     while (running) {
         // Bot 1 (White) plays
-        act_t bot1_move = bot::best_move(s, 4); // Adjust depth as needed
+        act_t bot1_move = bot::best_move(s, 5); // Adjust depth as needed
         s.move(bot1_move);
 
         // Render board after Bot 1's move
@@ -117,7 +117,7 @@ inline void play_bot(state_t& s) {
         }
 
         // Bot 2 (Black) plays
-        act_t bot2_move = bot::best_move(s, 4); // Adjust depth as needed
+        act_t bot2_move = bot::best_move(s, 5); // Adjust depth as needed
         s.move(bot2_move);
 
         // Render board after Bot 2's move

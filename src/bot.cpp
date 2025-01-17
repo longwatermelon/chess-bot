@@ -188,7 +188,7 @@ double bot::minimax(state_t &s, int d, double alpha, double beta, int &visited) 
     sort(all(moves),[s](act_t a, act_t b){return (s.at(a.dst)!='.') > (s.at(b.dst)!='.');});
 
     // leaf
-    if (d==0 || abs(static_eval(s))>=1e9) return static_eval(s);
+    if (d==0 || find(all(s.board),'k')==end(s.board) || find(all(s.board),'K')==end(s.board)) return static_eval(s);
 
     if (s.turn==0) {
         // white
