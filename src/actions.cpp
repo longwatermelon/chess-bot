@@ -35,7 +35,7 @@ void pawn_moves(pt_t p, const state_t &s, vec<act_t> &moves) {
     MV(p, p+pt_t{rd,0}, s, moves);
 
     // 2 step forward
-    if ((color(s.at(p))==0 && p.r==6) || (color(s.at(p))==1 && p.r==1)) {
+    if (s.mvok({p, p+pt_t{rd,0}}) && (color(s.at(p))==0 && p.r==6) || (color(s.at(p))==1 && p.r==1)) {
         MV(p, p+pt_t{rd*2,0}, s, moves);
     }
 
@@ -78,6 +78,14 @@ void king_moves(pt_t p, const state_t &s, vec<act_t> &moves) {
         if (!MV(p, p+pt_t{d8i[k],d8j[k]}, s, moves)) {
             CA(p, p+pt_t{d8i[k],d8j[k]}, s, moves);
         }
+    }
+
+    int r=s.turn==0?7:0;
+    if (p==pt_t{r, 4} && !s.has_king_moved(s.turn) && s.at({r,5})=='.' && s.at({r,6})=='.' && s.at({r,7})==(s.turn==0?'R':'r') && !s.has_rook_moved(s.turn,1)) {
+        MV(p, p+pt_t{0,2}, s, moves);
+    }
+    if (p==pt_t{r, 4} && !s.has_king_moved(s.turn) && s.at({r,3})=='.' && s.at({r,2})=='.' && s.at({r,1})=='.' && s.at({r,0})==(s.turn==0?'R':'r') && !s.has_rook_moved(s.turn,0)) {
+        MV(p, p+pt_t{0,-2}, s, moves);
     }
 }
 

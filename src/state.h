@@ -26,6 +26,23 @@ struct state_t {
     }
 
     void move(act_t a) {
+        if (at(a.src)=='K' && a.src==pt_t{7,4} && a.dst==pt_t{7,6} && at({7,5})=='.' && at({7,6})=='.' && at({7,7})=='R' && !king_moved[0] && !rook_moved[0][1]) {
+            atref({7,5}) = 'R';
+            atref({7,7}) = '.';
+        }
+        if (at(a.src)=='K' && a.src==pt_t{7,4} && a.dst==pt_t{7,2} && at({7,3})=='.' && at({7,2})=='.' && at({7,1})=='.' && at({7,0})=='R' && !king_moved[0] && !rook_moved[0][0]) {
+            atref({7,3}) = 'R';
+            atref({7,0}) = '.';
+        }
+        if (at(a.src)=='k' && a.src==pt_t{0,4} && a.dst==pt_t{0,6} && at({0,5})=='.' && at({0,6})=='.' && at({0,7})=='R' && !king_moved[1] && !rook_moved[1][1]) {
+            atref({0,5}) = 'r';
+            atref({0,7}) = '.';
+        }
+        if (at(a.src)=='k' && a.src==pt_t{0,4} && a.dst==pt_t{0,2} && at({0,3})=='.' && at({0,2})=='.' && at({0,1})=='.' && at({0,0})=='R' && !king_moved[1] && !rook_moved[1][0]) {
+            atref({0,3}) = 'r';
+            atref({0,0}) = '.';
+        }
+
         atref(a.dst) = at(a.src);
         atref(a.src) = '.';
         turn=1-turn;
