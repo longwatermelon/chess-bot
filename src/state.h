@@ -1,5 +1,6 @@
 #pragma once
 #include "util.h"
+#include "actions.h"
 
 // action src->dst
 struct act_t {
@@ -8,6 +9,7 @@ struct act_t {
 
 struct state_t {
     string board;
+    array<bool,64> attacked; // opponent attacking square
     int turn; // 0=white, 1=black
 
     bool king_moved[2] = {false,false};
@@ -26,22 +28,32 @@ struct state_t {
     }
 
     void move(act_t a) {
-        if (at(a.src)=='K' && a.src==pt_t{7,4} && a.dst==pt_t{7,6} && at({7,5})=='.' && at({7,6})=='.' && at({7,7})=='R' && !king_moved[0] && !rook_moved[0][1]) {
+        // castle
+        if (at(a.src)=='K' && a.src==pt_t{7,4} && !oppatk({7,4}) && a.dst==pt_t{7,6} && at({7,5})=='.' && !oppatk({7,5}) && at({7,6})=='.' && !oppatk({7,6}) && at({7,7})=='R' && !king_moved[0] && !rook_moved[0][1]) {
             atref({7,5}) = 'R';
             atref({7,7}) = '.';
         }
-        if (at(a.src)=='K' && a.src==pt_t{7,4} && a.dst==pt_t{7,2} && at({7,3})=='.' && at({7,2})=='.' && at({7,1})=='.' && at({7,0})=='R' && !king_moved[0] && !rook_moved[0][0]) {
+        if (at(a.src)=='K' && a.src==pt_t{7,4} && !oppatk({7,4}) && a.dst==pt_t{7,2} && at({7,3})=='.' && !oppatk({7,3}) && at({7,2})=='.' && !oppatk({7,2}) && at({7,1})=='.' && !oppatk({7,1}) && at({7,0})=='R' && !king_moved[0] && !rook_moved[0][0]) {
             atref({7,3}) = 'R';
             atref({7,0}) = '.';
         }
-        if (at(a.src)=='k' && a.src==pt_t{0,4} && a.dst==pt_t{0,6} && at({0,5})=='.' && at({0,6})=='.' && at({0,7})=='r' && !king_moved[1] && !rook_moved[1][1]) {
+        if (at(a.src)=='k' && a.src==pt_t{0,4} && !oppatk({0,4}) && a.dst==pt_t{0,6} && at({0,5})=='.' && !oppatk({0,5}) && at({0,6})=='.' && !oppatk({0,6}) && at({0,7})=='r' && !king_moved[1] && !rook_moved[1][1]) {
             atref({0,5}) = 'r';
             atref({0,7}) = '.';
         }
-        if (at(a.src)=='k' && a.src==pt_t{0,4} && a.dst==pt_t{0,2} && at({0,3})=='.' && at({0,2})=='.' && at({0,1})=='.' && at({0,0})=='r' && !king_moved[1] && !rook_moved[1][0]) {
+        if (at(a.src)=='k' && a.src==pt_t{0,4} && !oppatk({0,4}) && a.dst==pt_t{0,2} && at({0,3})=='.' && !oppatk({0,3}) && at({0,2})=='.' && !oppatk({0,2}) && at({0,1})=='.' && !oppatk({0,1}) && at({0,0})=='r' && !king_moved[1] && !rook_moved[1][0]) {
             atref({0,3}) = 'r';
             atref({0,0}) = '.';
         }
+
+        // if (at(a.src)=='k' && a.src==pt_t{0,4} && a.dst==pt_t{0,6} && at({0,5})=='.' && at({0,6})=='.' && at({0,7})=='r' && !king_moved[1] && !rook_moved[1][1]) {
+        //     atref({0,5}) = 'r';
+        //     atref({0,7}) = '.';
+        // }
+        // if (at(a.src)=='k' && a.src==pt_t{0,4} && a.dst==pt_t{0,2} && at({0,3})=='.' && at({0,2})=='.' && at({0,1})=='.' && at({0,0})=='r' && !king_moved[1] && !rook_moved[1][0]) {
+        //     atref({0,3}) = 'r';
+        //     atref({0,0}) = '.';
+        // }
 
         if (a.src==pt_t{7,4}) {
             king_moved[0]=true;
@@ -62,8 +74,24 @@ struct state_t {
             rook_moved[1][1]=true;
         }
 
+        // move
         atref(a.dst) = at(a.src);
         atref(a.src) = '.';
+
+        // pawn promotion
+        if (at(a.dst)=='P' && a.dst.r==0) {
+            atref(a.dst)='Q';
+        }
+        if (at(a.dst)=='p' && a.dst.r==7) {
+            atref(a.dst)='q';
+        }
+
+        vec<act_t> moves=actions(*this, false);
+        fill(all(attacked),false);
+        for (act_t a:moves) {
+            oppatkref(a.dst)=true;
+        }
+
         turn=1-turn;
     }
 
@@ -78,6 +106,14 @@ struct state_t {
         }
         assert(inside(p));
         return board[p.r*8+p.c];
+    }
+
+    bool oppatk(pt_t p) const {
+        return attacked[p.r*8+p.c];
+    }
+
+    bool &oppatkref(pt_t p) {
+        return attacked[p.r*8+p.c];
     }
 
     bool mvok(act_t a) const {

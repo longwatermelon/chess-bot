@@ -6,7 +6,7 @@
 #include <iostream>
 #include <unordered_map>
 
-inline void play(state_t& s) {
+inline void play(state_t& s, int bot_color, int depth) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
         return;
@@ -62,9 +62,15 @@ inline void play(state_t& s) {
     SDL_Event event;
     pt_t selected = {-1, -1};
     std::vector<pt_t> highlighted_squares;
+    pt_t last_move_src = {-1, -1};
+    pt_t last_move_dst = {-1, -1};
 
-    // act_t bot_move = bot::best_move(s, 4); // Depth 2 for bot
-    // s.move(bot_move);
+    if (bot_color==0) {
+        act_t bot_move = bot::best_move(s, depth); // Depth 2 for bot
+        last_move_src = bot_move.src;
+        last_move_dst = bot_move.dst;
+        s.move(bot_move);
+    }
 
     while (running) {
         // Handle events
@@ -84,6 +90,10 @@ inline void play(state_t& s) {
                         act_t move = {selected, clicked};
                         s.move(move);
 
+                        // Update last move
+                        last_move_src = selected;
+                        last_move_dst = clicked;
+
                         // Render board after player's move
                         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
                         SDL_RenderClear(renderer);
@@ -95,6 +105,16 @@ inline void play(state_t& s) {
                                 SDL_SetRenderDrawColor(renderer, (row + col) % 2 == 0 ? 240 : 80, (row + col) % 2 == 0 ? 217 : 50, (row + col) % 2 == 0 ? 181 : 30, 255);
                                 SDL_RenderFillRect(renderer, &square);
                             }
+                        }
+
+                        // Highlight last move in yellow
+                        if (last_move_src.r != -1) {
+                            SDL_SetRenderDrawColor(renderer, 255, 255, 0, 128);
+                            SDL_Rect highlight_src = {last_move_src.c * 100, last_move_src.r * 100, 100, 100};
+                            SDL_RenderFillRect(renderer, &highlight_src);
+
+                            SDL_Rect highlight_dst = {last_move_dst.c * 100, last_move_dst.r * 100, 100, 100};
+                            SDL_RenderFillRect(renderer, &highlight_dst);
                         }
 
                         // Draw pieces
@@ -132,7 +152,9 @@ inline void play(state_t& s) {
                         highlighted_squares.clear();
 
                         // Bot plays
-                        act_t bot_move = bot::best_move(s, 3); // Depth 2 for bot
+                        act_t bot_move = bot::best_move(s, depth); // Depth 2 for bot
+                        last_move_src = bot_move.src;
+                        last_move_dst = bot_move.dst;
                         s.move(bot_move);
                     } else {
                         // Deselect if clicking elsewhere
@@ -168,6 +190,16 @@ inline void play(state_t& s) {
                 SDL_SetRenderDrawColor(renderer, (row + col) % 2 == 0 ? 240 : 80, (row + col) % 2 == 0 ? 217 : 50, (row + col) % 2 == 0 ? 181 : 30, 255);
                 SDL_RenderFillRect(renderer, &square);
             }
+        }
+
+        // Highlight last move in yellow
+        if (last_move_src.r != -1) {
+            SDL_SetRenderDrawColor(renderer, 255, 255, 0, 128);
+            SDL_Rect highlight_src = {last_move_src.c * 100, last_move_src.r * 100, 100, 100};
+            SDL_RenderFillRect(renderer, &highlight_src);
+
+            SDL_Rect highlight_dst = {last_move_dst.c * 100, last_move_dst.r * 100, 100, 100};
+            SDL_RenderFillRect(renderer, &highlight_dst);
         }
 
         // Highlight possible moves

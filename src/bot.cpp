@@ -162,13 +162,9 @@ double bot::static_eval(state_t &s) {
     double res=0;
     for (int i=0; i<8; ++i) {
         for (int j=0; j<8; ++j) {
-            if (s.at({i,j})) continue;
+            if (s.at({i,j})=='.') continue;
             res+=pos_points[s.at({i,j})][i][j]/10 * (color(s.at({i,j}))==0 ? 1 : -1);
         }
-    }
-
-    if (abs(res)>0.05) {
-        printf("here\n");
     }
 
     map<char,double> value = {

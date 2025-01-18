@@ -32,10 +32,8 @@ void pawn_moves(pt_t p, const state_t &s, vec<act_t> &moves) {
     int rd=color(s.at(p))==0 ? -1 : 1; // row direction
 
     // 1 step forward
-    MV(p, p+pt_t{rd,0}, s, moves);
-
-    // 2 step forward
-    if (s.inside(p+pt_t{rd,0}) && s.at(p+pt_t{rd,0})=='.' && (color(s.at(p))==0 && p.r==6) || (color(s.at(p))==1 && p.r==1)) {
+    if (MV(p, p+pt_t{rd,0}, s, moves) && ((color(s.at(p))==0 && p.r==6) || (color(s.at(p))==1 && p.r==1))) {
+        // 2 step forward
         MV(p, p+pt_t{rd*2,0}, s, moves);
     }
 
@@ -81,10 +79,10 @@ void king_moves(pt_t p, const state_t &s, vec<act_t> &moves) {
     }
 
     int r=s.turn==0?7:0;
-    if (p==pt_t{r, 4} && !s.has_king_moved(s.turn) && s.at({r,5})=='.' && s.at({r,6})=='.' && s.at({r,7})==(s.turn==0?'R':'r') && !s.has_rook_moved(s.turn,1)) {
+    if (p==pt_t{r, 4} && !s.oppatk({r,4}) && !s.has_king_moved(s.turn) && s.at({r,5})=='.' && !s.oppatk({r,5}) && s.at({r,6})=='.' && !s.oppatk({r,6}) && s.at({r,7})==(s.turn==0?'R':'r') && !s.has_rook_moved(s.turn,1)) {
         MV(p, p+pt_t{0,2}, s, moves);
     }
-    if (p==pt_t{r, 4} && !s.has_king_moved(s.turn) && s.at({r,3})=='.' && s.at({r,2})=='.' && s.at({r,1})=='.' && s.at({r,0})==(s.turn==0?'R':'r') && !s.has_rook_moved(s.turn,0)) {
+    if (p==pt_t{r, 4} && !s.oppatk({r,4}) && !s.has_king_moved(s.turn) && s.at({r,3})=='.' && !s.oppatk({r,3}) && s.at({r,2})=='.' && !s.oppatk({r,2}) && s.at({r,1})=='.' && !s.oppatk({r,1}) && s.at({r,0})==(s.turn==0?'R':'r') && !s.has_rook_moved(s.turn,0)) {
         MV(p, p+pt_t{0,-2}, s, moves);
     }
 }
